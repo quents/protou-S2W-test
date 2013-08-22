@@ -97,10 +97,15 @@ choice
 
 	config DEFAULT_NOOP
 		bool "No-op"
-		
 	
 	config DEFAULT_SIO
-		bool "SIO" if IOSCHED_SIO=y
+		bool "SIO" if IOSCHED_SIO=
+		
+	config DEFAULT_FIOPS
+		bool "FIOPS" if IOSCHED_FIOPS=y
+
+	config DEFAULT_ROW
+		bool "ROW" if IOSCHED_ROW=y
 
 endchoice
 
