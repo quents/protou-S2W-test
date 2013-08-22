@@ -72,6 +72,13 @@ config CPU_FREQ_DEFAULT_GOV_SMARTASS2
  	select CPU_FREQ_GOV_SMARTASS2
  	help
  	  Use the CPUFreq governor 'smartassV2' as default.
+ 	  
+config CPU_FREQ_DEFAULT_GOV_LULZACTIVE
+	bool "lulzactive"
+	select CPU_FREQ_GOV_LULZACTIVE
+	select CPU_FREQ_GOV_PERFORMANCE
+	help
+	  Use the CPUFreq governor 'lulzactive' as default.
  
 
 config CPU_FREQ_DEFAULT_GOV_USERSPACE
@@ -134,6 +141,12 @@ config CPU_FREQ_GOV_SMARTASS2
  	depends on CPU_FREQ
  	help
  	  'smartassV2' - a "smart" optimized governor!
+ 	  
+config CPU_FREQ_GOV_LULZACTIVE
+	tristate "'lulzactive' cpufreq governor"
+	depends on CPU_FREQ
+	help
+	  'lulzactive' - a new interactive governor by Tegrak!
 
 config CPU_FREQ_GOV_POWERSAVE
 	tristate "'powersave' governor"
