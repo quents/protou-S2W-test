@@ -2,7 +2,8 @@ Fulmix-Kernel_3.4.0-protou
 ==========================
 
 Features:
-- Governors
+
+-Governors
 -- Conservative
 -- Interactive
 -- Ondemand
@@ -12,7 +13,7 @@ Features:
 -- lulzactive
 -- ondemandX
 -- interactiveX
-- Schedulers
+-Schedulers
 -- NOOP
 -- CFQ
 -- Deadline
