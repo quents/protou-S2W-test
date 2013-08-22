@@ -5,6 +5,8 @@ Features:
 
 - Governors: Conservative, Interactive, Ondemand, Performance, Powersave, smartassV2, lulzactive, ondemandX, interactiveX
 - Schedulers: NOOP, CFQ, Deadline, SIO
+- Swap support
+- Perflock Disabled
 
 
 Status
