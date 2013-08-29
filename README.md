@@ -1,5 +1,5 @@
-Fulmix-Kernel_3.4.0-protou
-==========================
+fulmix.Kernel #1 - protou
+=========================
 
 Features:
 
@@ -11,4 +11,4 @@ Features:
 
 Status
 ======
-Work In Progress
+Build #1 released on 29/08/2013 
