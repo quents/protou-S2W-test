@@ -3,7 +3,7 @@ fulmix.Kernel #1 - protou
 
 Features:
 
-- Governors: Conservative, Interactive, Ondemand, Performance, Powersave, smartassV2, lulzactive, ondemandX, interactiveX, Intellidemand and Hotplug
+- Governors: Conservative, Interactive, Ondemand, Performance, Powersave, smartassV2, lulzactive, ondemandX, interactiveX, Intellidemand, Hotplug and Lagfree
 - Schedulers: NOOP, CFQ, Deadline, SIO and FIOPS
 - Swap support
 - Perflock Disabled
