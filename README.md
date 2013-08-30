@@ -7,6 +7,7 @@ Features:
 - Schedulers: NOOP, CFQ, Deadline, SIO and FIOPS
 - Swap support
 - Perflock Disabled
+- KSM Enabled
 
 
 Status
