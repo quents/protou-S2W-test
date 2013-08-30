@@ -9,7 +9,7 @@ Features:
 - Perflock Disabled
 - KSM Enabled
 - CPU Freq Stats Enabled
-- CPU Spy Fixed
+- CPU Spy Fixed (?)
 
 
 Status
