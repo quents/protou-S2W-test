@@ -10,6 +10,7 @@ Features:
 - KSM Enabled
 - CPU Freq Stats Enabled
 - CPU Spy Fixed (?)
+- CIFS Support
 
 
 Status
