@@ -1317,8 +1317,10 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 
 				ts->pre_finger_data[loop_i][0] = x;
 				ts->pre_finger_data[loop_i][1] = y;
-
-
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+				printk(KERN_INFO "[S2W]Finger location  X:%d, Y:%d \n",
+						 x, y );
+#endif
 				if (ts->debug_log_level & 0x2)
 					printk(KERN_INFO "[TP]Finger %d=> X:%d, Y:%d w:%d, z:%d, F:%d\n",
 						loop_i + 1, x, y, w, w, loop_i + 1);
