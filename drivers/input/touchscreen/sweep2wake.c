@@ -37,7 +37,7 @@
 #define S2W_PWRKEY_DUR          60
 
 /* external function from the ts driver */
-extern bool is_single_touch(struct lge_touch_data *ts);
+extern bool is_single_touch(struct himax_ts_data *private_ts);
 
 /* Resources */
 int s2w_switch = 0;
@@ -94,10 +94,10 @@ void sweep2wake_pwrtrigger(void) {
 }
 
 /* Sweep2wake main function */
-void detect_sweep2wake(int x, int y, struct lge_touch_data *ts)
+void detect_sweep2wake(int x, int y, struct himax_ts_data *private_ts)
 {
         int prevx = 0, nextx = 0;
-        bool single_touch = is_single_touch(ts);
+        bool single_touch = 1;
 #if DEBUG
         pr_info("[sweep2wake]: x,y(%4d,%4d) single:%s\n",
                 x, y, (single_touch) ? "true" : "false");
