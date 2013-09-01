@@ -1450,12 +1450,12 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 //	printk(KERN_INFO "[S2W]Finger location  X:%d, Y:%d \n",
 //						 x, y );
 							if ((ts->finger_count == 1) && (scr_suspended == true) && (s2w_switch > 0)) {
-								prevx = 30;
+								prevx = 25;
 								nextx = 250;
 								if ((barrier[0] == true) ||
 								   ((x > prevx) &&
 								    (x < nextx) &&
-								    (y > 1780))) {
+								    (y > 1012))) {
 						if ((led_exec_count == true) && (scr_on_touch == false) && (s2w_switch == 2)) {
  						//pm8xxx_led_current_set(sweep2wake_leddev, 255);
 						//printk(KERN_INFO "[sweep2wake]: activated button backlight.\n");
@@ -1467,12 +1467,12 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 									if ((barrier[1] == true) ||
 									   ((x > prevx) &&
 									    (x < nextx) &&
-									    (y > 1780))) {
+									    (y > 1012))) {
 										prevx = nextx;
 										barrier[1] = true;
 										if ((x > prevx) &&
-										    (y > 1780)) {
-											if (x > 880) {
+										    (y > 1012)) {
+											if (x > 830) {
 												if (exec_count) {
 													printk(KERN_INFO "[sweep2wake]: ON");
 													sweep2wake_pwrtrigger();
@@ -1486,23 +1486,23 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 							//right->left
 							} else if ((ts->finger_count == 1) && (scr_suspended == false) && (s2w_switch > 0)) {
 								scr_on_touch=true;
-								prevx = 1100;
-								nextx = 880;
+								prevx = 960;
+								nextx = 830;
 								if ((barrier[0] == true) ||
 								   ((x < prevx) &&
 								    (x > nextx) &&
-								    (y > 1780))) {
+								    (y > 1012))) {
 									prevx = nextx;
 									nextx = 500;
 									barrier[0] = true;
 									if ((barrier[1] == true) ||
 									   ((x < prevx) &&
 									    (x > nextx) &&
-									    (y > 1780))) {
+									    (y > 1012))) {
 										prevx = nextx;
 										barrier[1] = true;
 										if ((x < prevx) &&
-										    (y > 1780)) {
+										    (y > 1012)) {
 											if (finger_data[i][0] < 250) {
 												if (exec_count) {
 													printk(KERN_INFO "[sweep2wake]: OFF");
