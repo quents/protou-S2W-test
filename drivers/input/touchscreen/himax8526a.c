@@ -29,6 +29,10 @@
 #include <mach/board.h>
 #include <asm/atomic.h>
 #include <mach/board_htc.h>
+#if 0
+#include <linux/input/sweep2wake.h>
+#endif
+
 
 #define HIMAX_I2C_RETRY_TIMES 10
 #define ESD_WORKAROUND
@@ -85,6 +89,27 @@ static struct himax_ts_data *private_ts;
 static void himax_ts_early_suspend(struct early_suspend *h);
 static void himax_ts_late_resume(struct early_suspend *h);
 #endif
+#if 0
+/* gives back true if only one touch is recognized */
+/* needs to be changed for your touchscreens params ... ill do that after we figure out the debug*/
+bool is_single_touch(struct himax_ts_data *private_ts)
+{
+        int i = 0, cnt = 0;
+
+        for( i = 0; i < ts->pdata->caps->max_id; i++ ) {
+                if ((!ts->pre_finger_data[i].state) ||
+                    (ts->pre_finger_data[i].state == ABS_RELEASE))
+                        continue;
+                else cnt++;
+        }
+        if (cnt == 1)
+                return true;
+        else
+                return false;
+}
+
+#endif
+
 
 int i2c_himax_read(struct i2c_client *client, uint8_t command, uint8_t *data, uint8_t length, uint8_t toRetry)
 {
@@ -1321,6 +1346,9 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 				printk(KERN_INFO "[S2W]Finger location  X:%d, Y:%d \n",
 						 x, y );
 #endif
+#if 0
+                        detect_sweep2wake(x, y, client, pdata, i2c_api);
+#endif
 				if (ts->debug_log_level & 0x2)
 					printk(KERN_INFO "[TP]Finger %d=> X:%d, Y:%d w:%d, z:%d, F:%d\n",
 						loop_i + 1, x, y, w, w, loop_i + 1);
@@ -1350,6 +1378,14 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 				}
 			}
 		}
+#if 0
+                        if (s2w_switch > 0) {
+                                exec_count = true;
+                                barrier[0] = false;
+                                barrier[1] = false;
+                                scr_on_touch = false;
+                        }
+#endif
 		ts->pre_finger_mask = finger_pressed;
 	}
 	if (ts->event_htc_enable_type != SWITCH_TO_HTC_EVENT_ONLY) {
