@@ -29,7 +29,7 @@
 #include <mach/board.h>
 #include <asm/atomic.h>
 #include <mach/board_htc.h>
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 #include <linux/ctype.h>
 #endif
 
@@ -90,9 +90,10 @@ static void himax_ts_early_suspend(struct early_suspend *h);
 static void himax_ts_late_resume(struct early_suspend *h);
 #endif
 
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 int s2w_switch = 1;
 bool exec_count = true;
+bool scr_suspended = false;
 bool scr_on_touch = false, led_exec_count = false, barrier[2] = {false, false};
 static struct input_dev * sweep2wake_pwrdev;
 //static struct led_classdev * sweep2wake_leddev;
@@ -125,11 +126,6 @@ extern void sweep2wake_setdev(struct input_dev * input_device) {
 }
 EXPORT_SYMBOL(sweep2wake_setdev);
 
-extern void sweep2wake_setleddev(struct led_classdev * led_dev) {
-	sweep2wake_leddev = led_dev;
-	return;
-}
-EXPORT_SYMBOL(sweep2wake_setleddev);
 
 static void sweep2wake_presspwr(struct work_struct * sweep2wake_presspwr_work) {
 	input_event(sweep2wake_pwrdev, EV_KEY, KEY_POWER, 1);
@@ -1105,7 +1101,7 @@ static ssize_t himax_set_en_sr(struct device *dev, struct device_attribute *attr
 
 static DEVICE_ATTR(sr_en, S_IWUSR, 0, himax_set_en_sr);
 
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 static ssize_t synaptics_sweep2wake_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
@@ -1190,7 +1186,7 @@ static int himax_touch_sysfs_init(void)
 		printk(KERN_ERR "[TP][TOUCH_ERR]%s: sysfs_create_file failed\n", __func__);
 		return ret;
 	}
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 	ret = sysfs_create_file(android_touch_kobj, &dev_attr_sweep2wake.attr);
 	if (ret) {
 		printk(KERN_ERR "%s: sysfs_create_file failed\n", __func__);
@@ -1213,7 +1209,7 @@ static void himax_touch_sysfs_deinit(void)
 #ifdef FAKE_EVENT
 	sysfs_remove_file(android_touch_kobj, &dev_attr_fake_event.attr);
 #endif
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 	sysfs_remove_file(android_touch_kobj, &dev_attr_sweep2wake.attr);
 #endif
 	sysfs_remove_file(android_touch_kobj, &dev_attr_sr_en.attr);
@@ -1227,7 +1223,7 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 #ifdef ESD_WORKAROUND
 	uint32_t checksum;
 #endif
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 	int prevx = 0, nextx = 0;
 #endif
 	memset(buf, 0x00, sizeof(buf));
@@ -1363,15 +1359,15 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 
 		if (ts->debug_log_level & 0x2)
 			printk(KERN_INFO "[TP]All Finger leave\n");
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 				/* if finger released, reset count & barriers */
-				if ((((ts->finger_count > 0)?1:0) == 0) && (s2w_switch > 0)) {
+				if ((((ts->pre_finger_data[loop_i][0] > 0)?1:0) == 0) && (s2w_switch > 0)) {
 				if ((s2w_switch == 2) &&
 			    	(scr_suspended == true) &&
 			    	(led_exec_count == false) &&
 			    	(scr_on_touch == false) &&
 			    	(exec_count == true)) {
-					pm8xxx_led_current_set(sweep2wake_leddev, 0);
+					//pm8xxx_led_current_set(sweep2wake_leddev, 0);
 					printk(KERN_INFO "[sweep2wake]: deactivated button backlight.\n");
 				}
 				exec_count = true;
@@ -1444,12 +1440,12 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 				printk(KERN_INFO "[S2W]Finger location  X:%d, Y:%d \n",
 						 x, y );
 #endif
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 
 // Debug info	
 //	printk(KERN_INFO "[S2W]Finger location  X:%d, Y:%d \n",
 //						 x, y );
-							if ((ts->finger_count == 1) && (scr_suspended == true) && (s2w_switch > 0)) {
+							if ((ts->pre_finger_data[loop_i][0] == 1) && (scr_suspended == true) && (s2w_switch > 0)) {
 								prevx = 25;
 								nextx = 250;
 								if ((barrier[0] == true) ||
@@ -1484,7 +1480,7 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 									}
 								}
 							//right->left
-							} else if ((ts->finger_count == 1) && (scr_suspended == false) && (s2w_switch > 0)) {
+							} else if ((ts->pre_finger_data[loop_i][0] == 1) && (scr_suspended == false) && (s2w_switch > 0)) {
 								scr_on_touch=true;
 								prevx = 960;
 								nextx = 830;
@@ -1503,7 +1499,7 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 										barrier[1] = true;
 										if ((x < prevx) &&
 										    (y > 1012)) {
-											if (finger_data[i][0] < 250) {
+											if (x < 250) {
 												if (exec_count) {
 													printk(KERN_INFO "[sweep2wake]: OFF");
 													sweep2wake_pwrtrigger();
@@ -1884,30 +1880,30 @@ static int himax8526a_suspend(struct i2c_client *client, pm_message_t mesg)
 		 HIMAX_I2C_RETRY_TIMES);
 
 	printk(KERN_DEBUG "[TP]%s: diag_command= %d\n", __func__, ts->diag_command);
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE      
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE      
 	if (s2w_switch > 0) {
 	      
 		enable_irq_wake(client->irq);
 		printk(KERN_INFO "[sweep2wake]: suspend but keep interupt wake going.\n");
 		if (s2w_switch == 2) {
 			//ensure backlight is turned off
-			pm8xxx_led_current_set(sweep2wake_leddev, 0);
+			//pm8xxx_led_current_set(sweep2wake_leddev, 0);
 			printk(KERN_INFO "[sweep2wake]: deactivated button backlight.\n");
 		}
  	} 
 #endif
 	printk(KERN_INFO "[TP]%s: enter\n", __func__);
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
                 if (s2w_switch == 0) {
 #endif
 	disable_irq(client->irq);
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 		}
 #endif
 	if (!ts->use_irq) {
 
 		ret = cancel_work_sync(&ts->work);
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
         if (s2w_switch == 0) {
                 if (ret && ts->use_irq) /* if work was pending disable-count is now 2 */
                         enable_irq(client->irq);
@@ -1940,7 +1936,7 @@ static int himax8526a_resume(struct i2c_client *client)
 	uint8_t new_command[2] = {0x91, 0x00};
 
 	struct himax_ts_data *ts = i2c_get_clientdata(client);
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE  
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE  
         if (s2w_switch > 0) {
                 //screen on, disable_irq_wake
                 scr_suspended = false;
@@ -1948,7 +1944,7 @@ static int himax8526a_resume(struct i2c_client *client)
         }
 #endif
 	printk(KERN_INFO "[TP]%s: enter\n", __func__);
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
         if (s2w_switch == 0) {
 #endif
 	if (ts->pdata->powerOff3V3 && ts->pdata->power)
@@ -1981,7 +1977,7 @@ static int himax8526a_resume(struct i2c_client *client)
 #if 0
 	printk(KERN_DEBUG "[TP]%s: diag_command= %d\n", __func__, ts->diag_command);
 #endif
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
         }
 #endif
 
@@ -2000,14 +1996,14 @@ static int himax8526a_resume(struct i2c_client *client)
 
 	i2c_himax_master_write(ts->client, ts->cable_config,
 		 sizeof(ts->cable_config), HIMAX_I2C_RETRY_TIMES);
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
         if (s2w_switch == 0) {
 #endif
 	ts->suspend_mode = 0;
 	ts->just_resume = 1;
 
 	enable_irq(client->irq);
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 	}
 #endif
 	return 0;
