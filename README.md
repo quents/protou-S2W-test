@@ -1,8 +1,8 @@
-fulmix.Kernel #1 - protou
-=========================
+fulmix.Kernel for HTC Desire X
+==============================
 
 Features:
-=========
+---------
 - Governors: Conservative, Interactive, Ondemand, Performance
 - Schedulers: NOOP, CFQ, Deadline, SIO and FIOPS
 - Swap support
