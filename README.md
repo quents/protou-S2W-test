@@ -14,11 +14,11 @@ Features:
 
 
 Status
-======
+---------
 - Build #1 released on 29/08/2013
 - Build #2 released on 01/09/2013
 
 
 Coming...
-=========
+---------
 - Governors: Powersave, smartassV2, lulzactive, ondemandX, interactiveX, Intellidemand, Hotplug and Lagfree
