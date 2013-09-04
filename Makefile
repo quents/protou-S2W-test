@@ -195,7 +195,8 @@ export KBUILD_BUILDHOST := $(SUBARCH)
 ARCH		?= $(SUBARCH)
 CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
 ARCH		:= arm
-CROSS_COMPILE	:= arm-eabi-
+#https://launchpad.net/linaro-toolchain-binaries/trunk/2013.07/+download/gcc-linaro-arm-linux-gnueabihf-4.8-2013.07-1_linux.tar.xz
+CROSS_COMPILE	:= /home/xpirt/android/toolchain/bin/arm-linux-gnueabihf-
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
@@ -376,7 +377,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -Wno-format-security \
 		   -fno-delete-null-pointer-checks
 KBUILD_AFLAGS_KERNEL :=
-KBUILD_CFLAGS_KERNEL :=
+KBUILD_CFLAGS_KERNEL := -w
 KBUILD_AFLAGS   := -D__ASSEMBLY__
 KBUILD_AFLAGS_MODULE  := -DMODULE
 KBUILD_CFLAGS_MODULE  := -DMODULE
