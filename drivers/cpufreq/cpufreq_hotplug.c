@@ -16,6 +16,7 @@
  */
 
 #include <linux/kernel.h>
+#include <linux/time.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/cpufreq.h>
@@ -355,7 +356,7 @@ static ssize_t store_ignore_nice_load(struct kobject *a, struct attribute *b,
 		dbs_info->prev_cpu_idle = get_cpu_idle_time(j,
 						&dbs_info->prev_cpu_wall);
 		if (dbs_tuners_ins.ignore_nice)
-			dbs_info->prev_cpu_nice = kstat_cpu(j).cpustat.nice;
+			dbs_info->prev_cpu_nice = kcpustat_cpu(j).cpustat[CPUTIME_NICE];
 
 	}
 	mutex_unlock(&dbs_mutex);
@@ -445,15 +446,14 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 		cur_idle_time = get_cpu_idle_time(j, &cur_wall_time);
 
 		/* how much wall time has passed since last iteration? */
-		wall_time = (unsigned int) cputime64_sub(cur_wall_time,
-				j_dbs_info->prev_cpu_wall);
+		wall_time = (unsigned int)
+			(cur_wall_time - j_dbs_info->prev_cpu_wall);
 		j_dbs_info->prev_cpu_wall = cur_wall_time;
 
 		/* how much idle time has passed since last iteration? */
-		idle_time = (unsigned int) cputime64_sub(cur_idle_time,
-				j_dbs_info->prev_cpu_idle);
+		idle_time = (unsigned int)
+			(cur_idle_time - j_dbs_info->prev_cpu_idle);
 		j_dbs_info->prev_cpu_idle = cur_idle_time;
-
 		if (unlikely(!wall_time || wall_time < idle_time))
 			continue;
 
@@ -640,7 +640,7 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 						&j_dbs_info->prev_cpu_wall);
 			if (dbs_tuners_ins.ignore_nice) {
 				j_dbs_info->prev_cpu_nice =
-						kstat_cpu(j).cpustat.nice;
+						kcpustat_cpu(j).cpustat[CPUTIME_NICE];
 			}
 
 			max_periods = max(DEFAULT_HOTPLUG_IN_SAMPLING_PERIODS,
