@@ -1346,6 +1346,85 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 						 0, loop_i+1, ts->pre_finger_data[loop_i][0],
 						 ts->pre_finger_data[loop_i][1]);
 					}
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+				printk(KERN_INFO "[S2W]Finger location  X:%d, Y:%d, Touch:%d \n",
+						 ts->pre_finger_data[loop_i][0], ts->pre_finger_data[loop_i][1] ,ts->pre_finger_data[loop_i][0] );
+#endif
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+
+// Debug info	
+//	printk(KERN_INFO "[S2W]Finger location  X:%d, Y:%d \n",
+//						 x, y );
+
+//ts->pre_finger_data[loop_i][0] = x;
+//ts->pre_finger_data[loop_i][1] = y;
+							if ((ts->pre_finger_data[loop_i][0] > 1) && (scr_suspended == true) && (s2w_switch > 0)) {
+								prevx = 25;
+								nextx = 250;
+								if ((barrier[0] == true) ||
+								   ((ts->pre_finger_data[loop_i][0] > prevx) &&
+								    (ts->pre_finger_data[loop_i][0] < nextx) &&
+								    (ts->pre_finger_data[loop_i][1] > 950))) {
+						if ((led_exec_count == true) && (scr_on_touch == false) && (s2w_switch == 2)) {
+ 						//pm8xxx_led_current_set(sweep2wake_leddev, 255);
+						//printk(KERN_INFO "[sweep2wake]: activated button backlight.\n");
+						led_exec_count = false;
+						}
+									prevx = nextx;
+									nextx = 818;
+									barrier[0] = true;
+									if ((barrier[1] == true) ||
+									   ((ts->pre_finger_data[loop_i][0] > prevx) &&
+									    (ts->pre_finger_data[loop_i][0] < nextx) &&
+									    (ts->pre_finger_data[loop_i][1] > 950))) {
+										prevx = nextx;
+										barrier[1] = true;
+										if ((ts->pre_finger_data[loop_i][0] > prevx) &&
+										    (ts->pre_finger_data[loop_i][1] > 950)) {
+											if (ts->pre_finger_data[loop_i][0] > 830) {
+												if (exec_count) {
+													printk(KERN_INFO "[sweep2wake]: ON");
+													sweep2wake_pwrtrigger();
+													exec_count = false;
+													break;
+												}
+											}
+										}
+									}
+								}
+							//right->left
+							} else if ((ts->pre_finger_data[loop_i][0] > 1) && (scr_suspended == false) && (s2w_switch > 0)) {
+								scr_on_touch=true;
+								prevx = 960;
+								nextx = 830;
+								if ((barrier[0] == true) ||
+								   ((ts->pre_finger_data[loop_i][0] < prevx) &&
+								    (ts->pre_finger_data[loop_i][0] > nextx) &&
+								    (ts->pre_finger_data[loop_i][1] > 950))) {
+									prevx = nextx;
+									nextx = 500;
+									barrier[0] = true;
+									if ((barrier[1] == true) ||
+									   ((ts->pre_finger_data[loop_i][0] < prevx) &&
+									    (ts->pre_finger_data[loop_i][0] > nextx) &&
+									    (ts->pre_finger_data[loop_i][1] > 950))) {
+										prevx = nextx;
+										barrier[1] = true;
+										if ((ts->pre_finger_data[loop_i][0] < prevx) &&
+										    (ts->pre_finger_data[loop_i][1] > 950)) {
+											if (ts->pre_finger_data[loop_i][0] < 250) {
+												if (exec_count) {
+													printk(KERN_INFO "[sweep2wake]: OFF");
+													sweep2wake_pwrtrigger();
+													exec_count = false;
+													break;
+												}
+											}
+										}
+									}
+								}
+							}
+#endif
 				}
 			}
 			ts->pre_finger_mask = 0;
@@ -1436,82 +1515,7 @@ inline void himax_ts_work(struct himax_ts_data *ts)
 
 				ts->pre_finger_data[loop_i][0] = x;
 				ts->pre_finger_data[loop_i][1] = y;
-#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
-				printk(KERN_INFO "[S2W]Finger location  X:%d, Y:%d, Touch:%d \n",
-						 x, y ,ts->pre_finger_data[loop_i][0] );
-#endif
-#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 
-// Debug info	
-//	printk(KERN_INFO "[S2W]Finger location  X:%d, Y:%d \n",
-//						 x, y );
-							if ((ts->pre_finger_data[loop_i][0] == 1) && (scr_suspended == true) && (s2w_switch > 0)) {
-								prevx = 25;
-								nextx = 250;
-								if ((barrier[0] == true) ||
-								   ((x > prevx) &&
-								    (x < nextx) &&
-								    (y > 1012))) {
-						if ((led_exec_count == true) && (scr_on_touch == false) && (s2w_switch == 2)) {
- 						//pm8xxx_led_current_set(sweep2wake_leddev, 255);
-						//printk(KERN_INFO "[sweep2wake]: activated button backlight.\n");
-						led_exec_count = false;
-						}
-									prevx = nextx;
-									nextx = 818;
-									barrier[0] = true;
-									if ((barrier[1] == true) ||
-									   ((x > prevx) &&
-									    (x < nextx) &&
-									    (y > 1012))) {
-										prevx = nextx;
-										barrier[1] = true;
-										if ((x > prevx) &&
-										    (y > 1012)) {
-											if (x > 830) {
-												if (exec_count) {
-													printk(KERN_INFO "[sweep2wake]: ON");
-													sweep2wake_pwrtrigger();
-													exec_count = false;
-													break;
-												}
-											}
-										}
-									}
-								}
-							//right->left
-							} else if ((ts->pre_finger_data[loop_i][0] == 1) && (scr_suspended == false) && (s2w_switch > 0)) {
-								scr_on_touch=true;
-								prevx = 960;
-								nextx = 830;
-								if ((barrier[0] == true) ||
-								   ((x < prevx) &&
-								    (x > nextx) &&
-								    (y > 1012))) {
-									prevx = nextx;
-									nextx = 500;
-									barrier[0] = true;
-									if ((barrier[1] == true) ||
-									   ((x < prevx) &&
-									    (x > nextx) &&
-									    (y > 1012))) {
-										prevx = nextx;
-										barrier[1] = true;
-										if ((x < prevx) &&
-										    (y > 1012)) {
-											if (x < 250) {
-												if (exec_count) {
-													printk(KERN_INFO "[sweep2wake]: OFF");
-													sweep2wake_pwrtrigger();
-													exec_count = false;
-													break;
-												}
-											}
-										}
-									}
-								}
-							}
-#endif
 				if (ts->debug_log_level & 0x2)
 					printk(KERN_INFO "[TP]Finger %d=> X:%d, Y:%d w:%d, z:%d, F:%d\n",
 						loop_i + 1, x, y, w, w, loop_i + 1);
