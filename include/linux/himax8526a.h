@@ -2,6 +2,7 @@
 #define HIMAX8526a_H
 #include <linux/types.h>
 #include <linux/i2c.h>
+#include <linux/input.h>
 
 #define HIMAX8526A_NAME "Himax8526a"
 #define HIMAX8526A_FINGER_SUPPORT_NUM 4
@@ -245,7 +246,7 @@ enum input_protocol_type {
 	PROTOCOL_TYPE_B	= 0x01,
 };
 
-#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
 /* Sweep2Wake */
 extern void sweep2wake_setdev(struct input_dev * input_device);
 //extern void sweep2wake_setleddev(struct led_classdev * led_dev);
